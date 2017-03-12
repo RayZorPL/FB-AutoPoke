@@ -8,7 +8,7 @@
 
 from robobrowser import RoboBrowser
 from urllib.parse import urlparse
-import time, argparse
+import time
 from getpass import getpass
 
 target = 'http://facebook.com'
