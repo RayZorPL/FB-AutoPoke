@@ -1,5 +1,5 @@
 #
-#	* AUTO POKE BOT v0.5 FOR FACEBOOK *
+#	* AUTO POKE BOT v0.6 FOR FACEBOOK *
 #	
 #	Tested on Python 3.4
 #
@@ -8,14 +8,10 @@
 
 from robobrowser import RoboBrowser
 from urllib.parse import urlparse
-import time
+import time, pickle, requests
 from getpass import getpass
 
-target = 'http://facebook.com'
-pokes_url = target + '/pokes/'
-login_url = target + '/login.php'
 
-br = RoboBrowser(parser='html.parser', history=False)
 
 def log_in():
 	print('### PLEASE LOG IN ###')
@@ -38,6 +34,8 @@ def log_in():
 		log_in()
 	else:
 		print("### LOGGED IN !! ###")
+		with open('.session', 'wb') as f:
+			pickle.dump(requests.utils.dict_from_cookiejar(session.cookies), f)
 		poke_idle()
 		
 
@@ -62,5 +60,22 @@ def auto_poke():
 					print('### POKED :) ###')
 			except KeyError:
 				pass
-		
-log_in()
+
+
+
+target = 'http://facebook.com'
+pokes_url = target + '/pokes/'
+login_url = target + '/login.php'
+
+session = requests.Session()
+br = RoboBrowser(parser='html.parser', history=False, session=session)
+
+try:
+	with open('.session', 'rb') as f:
+		cookies = requests.utils.cookiejar_from_dict(pickle.load(f))
+		session.cookies = cookies
+		print('### LOADED PREVIOUS SESSION ###')
+		poke_idle()
+except:
+	log_in()
+
